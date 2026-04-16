@@ -1,0 +1,154 @@
+from flask import Flask, request, jsonify, send_from_directory
+import boto3
+from botocore.exceptions import ClientError
+import logging
+from datetime import datetime
+
+# -----------------------------
+# Configuración del log
+# -----------------------------
+# Crea un archivo de log en /var/log para registrar accesos e interacciones
+logging.basicConfig(
+    filename='/var/log/flask_app.log',  # Ruta del archivo de logs
+    level=logging.INFO,  # Nivel de detalle
+    format='%(asctime)s - %(levelname)s - %(message)s'  # Formato del mensaje
+)
+
+# -----------------------------
+# Inicialización de la app Flask
+# -----------------------------
+app = Flask(__name__)
+
+# -----------------------------
+# Conexiones a servicios de AWS
+# -----------------------------
+dynamodb = boto3.resource('dynamodb', region_name='us-east-1')  # Cliente DynamoDB
+tabla = dynamodb.Table('clientes')  # Tabla clientes
+s3 = boto3.client('s3')  # Cliente S3
+BUCKET_NAME = 'buket-configuracion-wbservice-v1'  # Nombre del bucket
+
+# -----------------------------
+# Ruta principal para servir index.html
+# -----------------------------
+@app.route('/')
+def index():
+    ip = request.remote_addr  # IP del visitante
+    logging.info(f"[INDEX] Visita desde IP: {ip}")
+    return send_from_directory('/var/www/html', 'index.html')  # Sirve index.html
+
+# -----------------------------
+# Ruta para servir archivos estáticos (CSS, JS, etc.)
+# -----------------------------
+@app.route('/<path:filename>')
+def static_files(filename):
+    ip = request.remote_addr
+    logging.info(f"[STATIC] Acceso a: {filename} desde IP: {ip}")
+    return send_from_directory('/var/www/html', filename)
+
+# -----------------------------
+# Endpoint para guardar cliente en DynamoDB
+# -----------------------------
+@app.route('/api/clientes', methods=['POST'])
+def guardar_cliente():
+    ip = request.remote_addr
+    data = request.json
+    logging.info(f"[GUARDAR CLIENTE] Desde IP: {ip} - Datos: {data}")
+
+    campos_requeridos = ['cliente_id', 'nombre', 'correo', 'ciudad']
+    if not all(k in data and data[k] for k in campos_requeridos):
+        return jsonify({'error': 'Faltan datos requeridos'}), 400
+
+    try:
+        tabla.put_item(Item={
+            'clienteId': data['cliente_id'],  # Clave primaria
+            'nombre': data['nombre'],
+            'correo': data['correo'],
+            'ciudad': data['ciudad']
+        })
+        return jsonify({'mensaje': 'Cliente guardado exitosamente'}), 200
+    except ClientError as e:
+        return jsonify({'error': e.response['Error']['Message']}), 500
+
+# -----------------------------
+# Obtener cliente por ID desde DynamoDB
+# -----------------------------
+@app.route('/api/clientes/<cliente_id>', methods=['GET'])
+def obtener_cliente(cliente_id):
+    ip = request.remote_addr
+    logging.info(f"[BUSCAR CLIENTE] IP: {ip} - clienteId: {cliente_id}")
+    try:
+        respuesta = tabla.get_item(Key={'clienteId': cliente_id})
+        if 'Item' in respuesta:
+            return jsonify(respuesta['Item']), 200
+        else:
+            return jsonify({'mensaje': 'Cliente no encontrado'}), 404
+    except ClientError as e:
+        return jsonify({'error': e.response['Error']['Message']}), 500
+
+# -----------------------------
+# Listar todos los clientes (scan)
+# -----------------------------
+@app.route('/api/test-clientes', methods=['GET'])
+def listar_todos_clientes():
+    ip = request.remote_addr
+    logging.info(f"[LISTAR CLIENTES] IP: {ip}")
+    try:
+        respuesta = tabla.scan()
+        return jsonify(respuesta.get('Items', [])), 200
+    except ClientError as e:
+        return jsonify({'error': e.response['Error']['Message']}), 500
+
+# -----------------------------
+# Subir archivo a S3
+# -----------------------------
+@app.route('/api/subir', methods=['POST'])
+def subir_archivo():
+    ip = request.remote_addr
+    logging.info(f"[SUBIR ARCHIVO] Desde IP: {ip}")
+
+    if 'archivo' not in request.files:
+        return jsonify({'error': 'No se encontró el archivo'}), 400
+
+    archivo = request.files['archivo']
+    nombre_archivo = archivo.filename
+
+    try:
+        s3.upload_fileobj(archivo, BUCKET_NAME, nombre_archivo)
+        return jsonify({
+            'mensaje': f'Archivo "{nombre_archivo}" subido correctamente',
+            'url': f"https://{BUCKET_NAME}.s3.amazonaws.com/{nombre_archivo}"
+        }), 200
+    except ClientError as e:
+        return jsonify({'error': e.response['Error']['Message']}), 500
+
+# -----------------------------
+# Listar archivos S3 con URL prefirmada
+# -----------------------------
+@app.route('/api/archivos', methods=['GET'])
+def listar_archivos():
+    ip = request.remote_addr
+    logging.info(f"[LISTAR ARCHIVOS S3] Desde IP: {ip}")
+    try:
+        objetos = s3.list_objects_v2(Bucket=BUCKET_NAME)
+        archivos = []
+
+        for obj in objetos.get('Contents', []):
+            url_firmada = s3.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': BUCKET_NAME, 'Key': obj['Key']},
+                ExpiresIn=300  # Vigencia de 5 minutos
+            )
+            archivos.append({
+                'nombre': obj['Key'],
+                'url': url_firmada
+            })
+
+        return jsonify({'archivos': archivos})
+    except ClientError as e:
+        return jsonify({'error': e.response['Error']['Message']}), 500
+
+# -----------------------------
+# Ejecutar la aplicación Flask en puerto 80
+# -----------------------------
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=80)  # Escucha desde cualquier IP en el puerto 80

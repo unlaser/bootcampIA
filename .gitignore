@@ -26,3 +26,9 @@ frontend/dist/
 .DS_Store
 .vscode/
 Thumbs.db
+
+# Carpetas de estudio y practicas no relacionadas al despliegue
+aws/
+ejercicios cnn/
+ejercicios rnn/
+para organizar/

@@ -141,7 +141,7 @@ export default function FrontendPrediccionMedidas() {
             <Sparkles className="h-4 w-4" />
             AI Body Metrics Scanner
           </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl lg:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-500 pb-2">
+          <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl lg:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-slate-400 to-slate-600 pb-2">
             Predicción Anatómica
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-slate-400 max-w-2xl mx-auto">
@@ -159,7 +159,7 @@ export default function FrontendPrediccionMedidas() {
         >
           {/* Subtle glow border effect */}
           <div className="pointer-events-none absolute inset-0 rounded-[2rem] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]" />
-          
+
           <div className="grid gap-8 md:grid-cols-2">
             {/* Left Column: Gender & Height */}
             <div className="space-y-8 flex flex-col justify-center">
@@ -175,11 +175,10 @@ export default function FrontendPrediccionMedidas() {
                       key={option.value}
                       type="button"
                       onClick={() => setGenero(option.value)}
-                      className={`flex flex-1 items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition-all ${
-                        genero === option.value
+                      className={`flex flex-1 items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition-all ${genero === option.value
                           ? "border-cyan-500 bg-cyan-500/10 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
                           : "border-slate-800 bg-slate-950/50 text-slate-500 hover:border-slate-700 hover:text-slate-300"
-                      }`}
+                        }`}
                     >
                       <option.icon className="h-4 w-4" />
                       {option.label}
@@ -212,7 +211,7 @@ export default function FrontendPrediccionMedidas() {
             {/* Right Column: Upload/Preview Unified */}
             <div className="flex flex-col h-full">
               <label className="mb-3 block text-sm font-semibold tracking-wide text-slate-300 uppercase">3. Fotografía</label>
-              
+
               <label className="relative flex flex-1 min-h-[240px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[1.5rem] border-2 border-dashed border-slate-700 bg-slate-950/30 p-2 text-center transition-all hover:border-violet-500 hover:bg-slate-900/50">
                 <input
                   type="file"
@@ -220,7 +219,7 @@ export default function FrontendPrediccionMedidas() {
                   onChange={handleImageChange}
                   className="hidden"
                 />
-                
+
                 {preview ? (
                   <div className="group relative w-full h-full flex items-center justify-center bg-black/40 rounded-xl overflow-hidden">
                     <img
@@ -260,8 +259,8 @@ export default function FrontendPrediccionMedidas() {
             disabled={cargando}
             className="mt-8 relative group w-full overflow-hidden rounded-[1.25rem] p-[2px] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 opacity-70 group-hover:opacity-100 blur-sm transition-opacity duration-300"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-violet-600"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-500 via-slate-600 to-slate-700 opacity-70 group-hover:opacity-100 blur-sm transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-600 to-slate-800"></div>
             <div className="relative flex items-center justify-center gap-2 rounded-[18px] bg-slate-950/40 px-6 py-4 transition-all group-hover:bg-transparent">
               {cargando ? (
                 <>
@@ -307,7 +306,7 @@ export default function FrontendPrediccionMedidas() {
                     className="relative overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-900/80 p-6 flex flex-col items-center text-center shadow-[0_10px_40px_rgba(0,0,0,0.6)] backdrop-blur-xl group hover:border-violet-500/30 transition-colors"
                   >
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[2px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    
+
                     <div className="mb-4 rounded-full bg-slate-950 p-4 text-cyan-400 shadow-inner group-hover:text-violet-400 transition-colors border border-slate-800 group-hover:border-slate-700">
                       <Icon className="h-7 w-7" />
                     </div>

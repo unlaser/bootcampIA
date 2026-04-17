@@ -141,7 +141,7 @@ export default function FrontendPrediccionMedidas() {
             <Sparkles className="h-4 w-4" />
             AI Body Metrics Scanner
           </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl lg:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-slate-400 to-slate-600 pb-2">
+          <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl lg:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-500 pb-2">
             Predicción Anatómica
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-slate-400 max-w-2xl mx-auto">
@@ -259,8 +259,8 @@ export default function FrontendPrediccionMedidas() {
             disabled={cargando}
             className="mt-8 relative group w-full overflow-hidden rounded-[1.25rem] p-[2px] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-500 via-slate-600 to-slate-700 opacity-70 group-hover:opacity-100 blur-sm transition-opacity duration-300"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-600 to-slate-800"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 opacity-70 group-hover:opacity-100 blur-sm transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-violet-600"></div>
             <div className="relative flex items-center justify-center gap-2 rounded-[18px] bg-slate-950/40 px-6 py-4 transition-all group-hover:bg-transparent">
               {cargando ? (
                 <>
